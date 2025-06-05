@@ -1,0 +1,64 @@
+def convert_to_binary_array(input_str, n):
+    # Try interpreting as binary string
+    if all(char in '01' for char in input_str):
+        binary_array = [int(char) for char in input_str[:n]]
+        return binary_array + [0] * (n - len(binary_array))  # pad if needed
+
+    # Try interpreting as regular string (ASCII -> binary)
+    try:
+        binary_string = ''.join(f"{ord(c):08b}" for c in input_str)
+        binary_array = [int(bit) for bit in binary_string[:n]]
+        return binary_array + [0] * (n - len(binary_array))
+    except:
+        pass
+
+    # Try interpreting as number
+    try:
+        num = int(input_str)
+        binary_string = bin(num)[2:]
+        binary_array = [int(bit) for bit in binary_string[:n]]
+        return binary_array + [0] * (n - len(binary_array))
+    except:
+        raise ValueError("Invalid input: Must be a binary string, regular string, or a number.")
+
+
+def bitwise_operations(BMP1, BMP2, n, W1):
+    BMP1 = BMP1[:n] + [0] * (n - len(BMP1))
+    BMP2 = BMP2[:n] + [0] * (n - len(BMP2))
+
+    # Step 5: AND operation
+    R = [bmp1 & bmp2 for bmp1, bmp2 in zip(BMP1, BMP2)]
+
+    # Step 6: XOR to update BMP1 and BMP2
+    BMP1 = [bmp1 ^ r for bmp1, r in zip(BMP1, R)]
+    BMP2 = [bmp2 ^ r for bmp2, r in zip(BMP2, R)]
+
+    # Step 7: Check sum against threshold
+    if sum(R) > W1:
+        return R
+    else:
+        return []
+
+
+def main():
+    size_bmp1 = int(input("Enter the size of BMP1: "))
+    bmp1_input = input("Enter BMP1 (binary string, regular string, or number): ")
+
+    size_bmp2 = int(input("Enter the size of BMP2: "))
+    bmp2_input = input("Enter BMP2 (binary string, regular string, or number): ")
+
+    n = int(input("Enter the number of bits to process (n): "))
+    W1 = int(input("Enter the threshold value (W1): "))
+
+    try:
+        BMP1 = convert_to_binary_array(bmp1_input, size_bmp1)
+        BMP2 = convert_to_binary_array(bmp2_input, size_bmp2)
+
+        result = bitwise_operations(BMP1, BMP2, n, W1)
+        print("IB_Results:", result)
+    except ValueError as e:
+        print("Error:", e)
+
+
+if __name__ == "__main__":
+    main()
